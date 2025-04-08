@@ -1,0 +1,53 @@
+#!/bin/bash
+
+get_info() {
+    case $1 in
+        os)
+            echo "$(cat /etc/os-release | grep PRETTY_NAME | cut -d '"' -f2)"
+            ;;
+        kernel)
+            echo "$(uname -sr)"
+            ;;
+        uptime)
+            echo "$(uptime -p)"
+            ;;
+        memory)
+            echo "$(free -h | awk '/^Mem:/ {print $2}')"
+            ;;
+        cpu)
+            echo "$(lscpu | grep 'Model name' | cut -d ':' -f2 | xargs)"
+            ;;
+        gpu)
+            echo "$(lspci | grep VGA | cut -d ':' -f3 | head -n1 | xargs)"
+            ;;
+        resolution)
+            echo "$(xdpyinfo | grep dimensions | cut -d ':' -f2 | xargs)"
+            ;;
+        shell)
+            echo "$SHELL"
+            ;;
+        terminal)
+            echo "$TERM"
+            ;;
+        wm)
+            echo "$(wmctrl -m | grep Name | cut -d ':' -f2 | xargs)"
+            ;;
+        de)
+            echo "$(grep -m 1 "^DESKTOP_SESSION=" /etc/environment | cut -d '=' -f2)"
+            ;;
+        hostname)
+            echo "$(hostnamectl | grep 'Operating System' | cut -d ':' -f2 | xargs)"
+            ;;
+    esac
+}
+
+echo "--------- lfetch ---------"
+echo "SYSTEM: $(get_info os)"
+echo "KERNEL: $(get_info kernel)"
+echo "UPTIME: $(get_info uptime)"
+echo "MEMORY: $(get_info memory)"
+echo "SHELL: $(get_info shell)"
+echo "TERMINAL: $(get_info terminal)"
+echo "WM: $(get_info wm)"
+echo "DE: $(get_info de)"
+# add other info on your discretion
